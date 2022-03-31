@@ -1,0 +1,53 @@
+---
+title: "class_dataset_cleaning"
+author: "Drew Walker"
+date: "3/31/2022"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(haven)
+library(tidyverse)
+library(table1)
+library(here)
+```
+
+# NHIS Dataset
+
+## Load
+```{r adult}
+adult_dataset <- read_csv("adult20.csv")
+
+child_dataset <- read_csv("child20.csv")
+```
+
+## filter south
+```{r child}
+
+# Just checking frequencies of the regions real quick
+head(adult_dataset$REGION, n = 10)
+adult_dataset$REGION = as.factor(adult_dataset$REGION)
+table1(~REGION, data=adult_dataset)
+
+#FIlter adult for southern region, see codebook
+adult_dataset_south <- adult_dataset %>% 
+  filter(REGION == "3")
+
+write_csv(adult_dataset_south, "adult_nhis_south_2020.csv")
+
+# Filter child region
+
+child_dataset_south <- child_dataset %>% 
+  filter(REGION == "3")
+write_csv(child_dataset_south, "child_nhis_south_2020.csv")
+
+library(foreign)
+
+write.foreign(df=adult_dataset_south, datafile="adult_test.csv", codefile="test_adult_nhis_2020.sas", package="SAS")
+
+
+write.foreign(df=child_dataset_south, datafile="child_test.csv", codefile="child_test_nhis_2020.sas", package="SAS")
+
+```
+
